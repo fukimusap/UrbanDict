@@ -1,0 +1,7 @@
+<resources>
+  <string name="app_name">UrbanDict</string>
+  <string name="sort_up">Sort up</string>
+  <string name="sort_down">Sort down</string>
+  <string name="title_search">Search</string>
+  <string name="search_hint">Define…</string>
+</resources>
