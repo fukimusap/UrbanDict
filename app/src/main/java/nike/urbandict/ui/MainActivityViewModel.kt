@@ -38,7 +38,6 @@ class MainActivityViewModel @ViewModelInject constructor(
     fun sort(sortOrder: SortOrder) {
         stateHandle[STATE_SORT_ORDER] = sortOrder.ordinal
         val mutableLiveData = definitions as MutableLiveData
-        currentJob?.cancel()
         currentJob = viewModelScope.launch(coroutineContextProvider.Main) {
             val currentValue = definitions.value
             if (currentValue?.data.isNullOrEmpty()) {
@@ -85,7 +84,6 @@ class MainActivityViewModel @ViewModelInject constructor(
         stateHandle[STATE_SORT_ORDER] = sortOrder.ordinal
 
         val mutableLiveData = definitions as MutableLiveData
-        currentJob?.cancel()
 
         if (term.isBlank()) {
             mutableLiveData.value =
@@ -139,6 +137,10 @@ class MainActivityViewModel @ViewModelInject constructor(
         }
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        currentJob?.cancel()
+    }
     companion object {
         private const val STATE_TERM = "term"
         private const val STATE_SORT_ORDER = "sort"

@@ -182,6 +182,4 @@ class MainActivityViewModelTest {
         error.consume()
         assertTrue(error.consumed)
     }
-
-
 }
