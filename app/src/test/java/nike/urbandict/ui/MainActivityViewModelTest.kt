@@ -8,6 +8,8 @@ import kotlinx.coroutines.runBlocking
 import nike.urbandict.api.DefineResponse
 import nike.urbandict.api.Definition
 import nike.urbandict.api.UrbanDictApi
+import nike.urbandict.model.DefinitionsProcessor
+import nike.urbandict.model.ProcessedDefinition
 import nike.urbandict.ui.MainActivityViewModel.SortOrder
 import org.junit.Assert.*
 import org.junit.Rule
@@ -24,6 +26,19 @@ class MainActivityViewModelTest {
 
     private val api = mock<UrbanDictApi>()
     private val savedStateHandle = mock<SavedStateHandle>()
+    private val definitionsProcessor = mock<DefinitionsProcessor>().apply {
+        doAnswer {
+            val raw = it.arguments.first() as Definition
+            ProcessedDefinition(
+                mock(),
+                raw.word,
+                raw.thumbsUp,
+                raw.thumbsDown,
+                raw.id
+            )
+        }.`when`(this).process(any())
+    }
+    private val coroutineContextProvider = TestCoroutineContextProvider()
 
     private val response = DefineResponse(
         listOf(
@@ -75,8 +90,12 @@ class MainActivityViewModelTest {
         runBlocking {
             doReturn(response).`when`(api).define(eq("wat"))
 
-            val viewModel =
-                MainActivityViewModel(savedStateHandle, api, TestCoroutineContextProvider())
+            val viewModel = MainActivityViewModel(
+                savedStateHandle,
+                api,
+                coroutineContextProvider,
+                definitionsProcessor
+            )
 
             viewModel.search("wat", SortOrder.THUMBS_UP)
 
@@ -95,8 +114,12 @@ class MainActivityViewModelTest {
         runBlocking {
             doThrow(IllegalStateException()).`when`(api).define(any())
 
-            val viewModel =
-                MainActivityViewModel(savedStateHandle, api, TestCoroutineContextProvider())
+            val viewModel = MainActivityViewModel(
+                savedStateHandle,
+                api,
+                coroutineContextProvider,
+                definitionsProcessor
+            )
 
             viewModel.search("wat", SortOrder.THUMBS_UP)
 
@@ -112,8 +135,12 @@ class MainActivityViewModelTest {
         runBlocking {
             doReturn(response).`when`(api).define(eq("wat"))
 
-            val viewModel =
-                MainActivityViewModel(savedStateHandle, api, TestCoroutineContextProvider())
+            val viewModel = MainActivityViewModel(
+                savedStateHandle,
+                api,
+                coroutineContextProvider,
+                definitionsProcessor
+            )
 
             viewModel.search("wat", SortOrder.THUMBS_UP)
 
@@ -138,8 +165,12 @@ class MainActivityViewModelTest {
         runBlocking {
             doReturn(response).`when`(api).define(eq("wat"))
 
-            val viewModel =
-                MainActivityViewModel(savedStateHandle, api, TestCoroutineContextProvider())
+            val viewModel = MainActivityViewModel(
+                savedStateHandle,
+                api,
+                coroutineContextProvider,
+                definitionsProcessor
+            )
 
             viewModel.search("wat", SortOrder.THUMBS_UP)
 
@@ -150,7 +181,6 @@ class MainActivityViewModelTest {
 
             viewModel.refresh(SortOrder.THUMBS_UP)
             viewModel.definitions.getOrAwaitValue()
-
             verify(api, times(2)).define(eq("wat"))
         }
     }
@@ -161,11 +191,15 @@ class MainActivityViewModelTest {
             doAnswer { CountDownLatch(1).await(5, TimeUnit.SECONDS) }.`when`(api)
                 .define(eq("wat"))
 
-            val viewModel =
-                MainActivityViewModel(savedStateHandle, api, object : TestCoroutineContextProvider() {
+            val viewModel = MainActivityViewModel(
+                savedStateHandle,
+                api,
+                object : TestCoroutineContextProvider() {
                     override val IO: CoroutineContext
                         get() = Dispatchers.IO
-                })
+                },
+                definitionsProcessor
+            )
 
             viewModel.search("wat", SortOrder.THUMBS_UP)
 

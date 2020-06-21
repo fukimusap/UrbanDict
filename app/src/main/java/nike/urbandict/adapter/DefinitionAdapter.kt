@@ -1,10 +1,7 @@
 package nike.urbandict.adapter
 
-import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearSmoothScroller
@@ -14,16 +11,23 @@ import nike.urbandict.model.ProcessedDefinition
 
 class DefinitionsAdapter : RecyclerView.Adapter<DefinitionViewHolder>() {
 
-    private val differ: AsyncListDiffer<ProcessedDefinition> = AsyncListDiffer(this, object : DiffUtil.ItemCallback<ProcessedDefinition>() {
-        override fun areItemsTheSame(oldItem: ProcessedDefinition, newItem: ProcessedDefinition): Boolean {
-            return oldItem.id == newItem.id
-        }
+    private val differ: AsyncListDiffer<ProcessedDefinition> =
+        AsyncListDiffer(this, object : DiffUtil.ItemCallback<ProcessedDefinition>() {
+            override fun areItemsTheSame(
+                oldItem: ProcessedDefinition,
+                newItem: ProcessedDefinition
+            ): Boolean {
+                return oldItem.id == newItem.id
+            }
 
-        override fun areContentsTheSame(oldItem: ProcessedDefinition, newItem: ProcessedDefinition): Boolean {
-            return oldItem.thumbsUp == newItem.thumbsUp && oldItem.thumbsDown == newItem.thumbsDown
-                    && oldItem.definition == newItem.definition
-        }
-    })
+            override fun areContentsTheSame(
+                oldItem: ProcessedDefinition,
+                newItem: ProcessedDefinition
+            ): Boolean {
+                return oldItem.thumbsUp == newItem.thumbsUp && oldItem.thumbsDown == newItem.thumbsDown
+                        && oldItem.definition == newItem.definition
+            }
+        })
 
     private var recyclerView: RecyclerView? = null
 
@@ -81,13 +85,4 @@ class DefinitionsAdapter : RecyclerView.Adapter<DefinitionViewHolder>() {
     }
 }
 
-class DefinitionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    val titleView: TextView = itemView.findViewById(R.id.titleView)
-    val definitionView: TextView = itemView.findViewById(R.id.definitionView)
-    val thumbsUpView: TextView = itemView.findViewById(R.id.thumbsUpView)
-    val thumbsDownView: TextView = itemView.findViewById(R.id.thumbsDownView)
 
-    init {
-        definitionView.movementMethod = LinkMovementMethod.getInstance()
-    }
-}

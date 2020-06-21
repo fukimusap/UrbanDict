@@ -16,6 +16,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 import java.util.concurrent.TimeUnit
+import javax.inject.Qualifier
 
 
 @Module
@@ -23,17 +24,26 @@ import java.util.concurrent.TimeUnit
 class NetworkModule {
 
     @Provides
-    fun provideApi(@ApplicationContext context: Context): UrbanDictApi {
+    fun provideApi(@ApplicationContext context: Context, @BaseUrl url: String, @Headers headers: Map<String, String>): UrbanDictApi {
         val httpCacheDirectory = File(context.cacheDir, "http-cache")
         val cacheSize = 10L * 1024L * 1024L
         val cache = Cache(httpCacheDirectory, cacheSize)
 
         return Retrofit.Builder()
-            .baseUrl(UrbanDictApi.DEFAULT_URL)
+            .baseUrl(url)
             .addConverterFactory(GsonConverterFactory.create())
             .client(
                 OkHttpClient.Builder()
                     .cache(cache)
+                    .addInterceptor {
+                        it.proceed(it.request().newBuilder()
+                            .apply {
+                                headers.forEach { entry ->
+                                    addHeader(entry.key, entry.value)
+                                }
+                            }
+                            .build())
+                    }
                     .addInterceptor(HttpLoggingInterceptor().apply {
                         level = HttpLoggingInterceptor.Level.BODY
                     })
@@ -82,4 +92,25 @@ class NetworkModule {
             .build()
             .create(UrbanDictApi::class.java)
     }
+
+    @Provides
+    @Headers
+    fun provideHeaders(): Map<String, String> {
+        return mapOf(
+            "x-rapidapi-host" to "mashape-community-urban-dictionary.p.rapidapi.com",
+            "x-rapidapi-key" to "f2ba86279fmsh184468eceeb0123p116c5djsn2d8cd17af2d8"
+        )
+    }
+
+    @Provides
+    @BaseUrl
+    fun provideUrl(): String {
+        return "https://mashape-community-urban-dictionary.p.rapidapi.com"
+    }
 }
+
+@Qualifier
+annotation class BaseUrl
+
+@Qualifier
+annotation class Headers

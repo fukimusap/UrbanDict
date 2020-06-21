@@ -1,5 +1,6 @@
 package nike.urbandict.ui
 
+import android.app.Activity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -37,7 +38,7 @@ class MainActivityTest {
         onView(withResourceName("search_src_text"))
             .perform(TypeTextAction("wat"), pressImeActionButton())
 
-        waitUntilLoaded { activity.findViewById(R.id.definitionsView) }
+        waitUntilLoaded(activity)
 
         assertFalse(activity.findViewById<SwipeRefreshLayout>(R.id.swipeRefreshView).isRefreshing)
 
@@ -52,20 +53,20 @@ class MainActivityTest {
     /**
      * Stop the test until RecyclerView's data gets loaded.
      *
-     * Passed [recyclerProvider] will be activated in UI thread, allowing you to retrieve the View.
-     *
      * Workaround for https://issuetracker.google.com/issues/123653014
      */
-    inline fun waitUntilLoaded(crossinline recyclerProvider: () -> RecyclerView) {
+    private fun waitUntilLoaded(activity: Activity) {
         Espresso.onIdle()
 
-        lateinit var recycler: RecyclerView
+        lateinit var recycleView: RecyclerView
+        lateinit var refreshView: SwipeRefreshLayout
 
         InstrumentationRegistry.getInstrumentation().runOnMainSync {
-            recycler = recyclerProvider()
+            recycleView = activity.findViewById(R.id.definitionsView)
+            refreshView = activity.findViewById(R.id.swipeRefreshView)
         }
 
-        while (recycler.hasPendingAdapterUpdates()) {
+        while (recycleView.hasPendingAdapterUpdates() || refreshView.isRefreshing) {
             Thread.sleep(10)
         }
     }

@@ -17,7 +17,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 import nike.urbandict.R
 import nike.urbandict.adapter.DefinitionsAdapter
-import nike.urbandict.model.ProcessedDefinition
+import nike.urbandict.model.DefinitionsProcessor
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -26,6 +27,9 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: MainActivityViewModel by lazy {
         ViewModelProvider(this)[MainActivityViewModel::class.java]
     }
+
+    @Inject
+    lateinit var definitionsProcessor: DefinitionsProcessor
 
     private val currentSortOrder: MainActivityViewModel.SortOrder
         get() {
@@ -42,7 +46,41 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbarView)
+        setUpAdapter()
+        setUpSearchView()
 
+        if (savedInstanceState == null) {
+            handleIntent(intent)
+        }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        if (intent != null) {
+            handleIntent(intent)
+        }
+    }
+
+    private fun setUpAdapter() {
+        val adapter = DefinitionsAdapter()
+        val layoutManager = LinearLayoutManager(this)
+        definitionsView.layoutManager = layoutManager
+        definitionsView.adapter = adapter
+        viewModel.definitions.observe(this, Observer { result ->
+            swipeRefreshView.isRefreshing = result.isLoading
+            navView.isEnabled = !result.isLoading
+            adapter.submitList(result.data.orEmpty())
+            if (result.error?.consumed == false) {
+                val throwable = result.error.consume()
+                Log.e(TAG, "Failed to load definitions", throwable)
+
+                Toast.makeText(this, throwable.localizedMessage, Toast.LENGTH_LONG).show()
+            }
+        })
+    }
+
+    private fun setUpSearchView() {
         val inputMM = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
         searchView = SearchView(
@@ -76,22 +114,6 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
         supportActionBar?.setDisplayShowCustomEnabled(true)
 
-        val adapter = DefinitionsAdapter()
-        val layoutManager = LinearLayoutManager(this)
-        definitionsView.layoutManager = layoutManager
-        definitionsView.adapter = adapter
-        viewModel.definitions.observe(this, Observer { result ->
-            swipeRefreshView.isRefreshing = result.isLoading
-            navView.isEnabled = !result.isLoading
-            adapter.submitList(result.data.orEmpty())
-            if (result.error?.consumed == false) {
-                val throwable = result.error.consume()
-                Log.e(TAG, "Failed to load definitions", throwable)
-
-                Toast.makeText(this, throwable.localizedMessage, Toast.LENGTH_LONG).show()
-            }
-        })
-
         swipeRefreshView.setOnRefreshListener {
             viewModel.refresh(currentSortOrder)
             inputMM.hideSoftInputFromWindow(searchView.applicationWindowToken, 0)
@@ -103,21 +125,13 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        if (savedInstanceState == null) {
-            handleIntent(intent)
-        }
-    }
-
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        setIntent(intent)
-        if (intent != null) {
-            handleIntent(intent)
-        }
     }
 
     private fun handleIntent(intent: Intent) {
-        if (intent.action == Intent.ACTION_VIEW && intent.dataString?.startsWith(ProcessedDefinition.BASE_URI.toString()) == true) {
+        if (intent.action == Intent.ACTION_VIEW && intent.dataString?.startsWith(
+                definitionsProcessor.BASE_URI.toString()
+            ) == true
+        ) {
             val word = intent.data?.lastPathSegment
             if (!word.isNullOrBlank()) {
                 searchView.setQuery(word, true)

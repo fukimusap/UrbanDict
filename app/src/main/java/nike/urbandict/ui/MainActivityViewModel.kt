@@ -9,12 +9,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import nike.urbandict.api.UrbanDictApi
 import nike.urbandict.di.CoroutineContextProvider
+import nike.urbandict.model.DefinitionsProcessor
 import nike.urbandict.model.ProcessedDefinition
 
 class MainActivityViewModel @ViewModelInject constructor(
     @Assisted private val stateHandle: SavedStateHandle,
     private val api: UrbanDictApi,
-    private val coroutineContextProvider: CoroutineContextProvider
+    private val coroutineContextProvider: CoroutineContextProvider,
+    private val definitionsProcessor: DefinitionsProcessor
 ) : ViewModel() {
 
     val definitions: LiveData<Result<List<ProcessedDefinition>>> = MutableLiveData()
@@ -107,7 +109,7 @@ class MainActivityViewModel @ViewModelInject constructor(
             try {
                 val searchResult = withContext(coroutineContextProvider.IO) {
                     api.define(term).list
-                        .map { ProcessedDefinition.fromDefinition(it) }
+                        .map { definitionsProcessor.process(it) }
                         .sortedByDescending {
                             if (sortOrder == SortOrder.THUMBS_UP) {
                                 it.thumbsUp
@@ -163,5 +165,4 @@ class MainActivityViewModel @ViewModelInject constructor(
         THUMBS_UP,
         THUMBS_DOWN
     }
-
 }
