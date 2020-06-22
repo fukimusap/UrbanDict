@@ -86,7 +86,7 @@ class MainActivityViewModelTest {
     )
 
     @Test
-    fun searchTest() {
+    fun validTerm_searchThumpsUp_getDefinitionsSortedUp() {
         runBlocking {
             doReturn(response).`when`(api).define(eq("wat"))
 
@@ -110,7 +110,7 @@ class MainActivityViewModelTest {
     }
 
     @Test
-    fun searchError() {
+    fun validTerm_searchThumpsUp_getError() {
         runBlocking {
             doThrow(IllegalStateException()).`when`(api).define(any())
 
@@ -131,7 +131,7 @@ class MainActivityViewModelTest {
     }
 
     @Test
-    fun sortingTest() {
+    fun validTerm_search_getDefinitionsSorted(){
         runBlocking {
             doReturn(response).`when`(api).define(eq("wat"))
 
@@ -161,7 +161,7 @@ class MainActivityViewModelTest {
     }
 
     @Test
-    fun refreshTest() {
+    fun viewModel_getRefreshedData() {
         runBlocking {
             doReturn(response).`when`(api).define(eq("wat"))
 
@@ -186,7 +186,7 @@ class MainActivityViewModelTest {
     }
 
     @Test
-    fun startWithLoading() {
+    fun validTerm_startWithLoading_getLoadedDefinitions() {
         runBlocking {
             doAnswer { CountDownLatch(1).await(5, TimeUnit.SECONDS) }.`when`(api)
                 .define(eq("wat"))
@@ -210,7 +210,7 @@ class MainActivityViewModelTest {
     }
 
     @Test
-    fun consumeError() {
+    fun viewModel_checkConsumedError() {
         val error = MainActivityViewModel.LoadingError(NullPointerException())
         assertFalse(error.consumed)
         error.consume()

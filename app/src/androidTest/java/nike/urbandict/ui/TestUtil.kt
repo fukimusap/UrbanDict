@@ -1,26 +1,30 @@
 package nike.urbandict.ui
 
+import android.app.Activity
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.test.espresso.Espresso
 import androidx.test.platform.app.InstrumentationRegistry
+import nike.urbandict.R
 
 /**
  * Stop the test until RecyclerView's data gets loaded.
  *
- * Passed [recyclerProvider] will be activated in UI thread, allowing you to retrieve the View.
- *
  * Workaround for https://issuetracker.google.com/issues/123653014
  */
-inline fun waitUntilLoaded(crossinline recyclerProvider: () -> RecyclerView) {
+fun waitUntilLoaded(activity: Activity) {
     Espresso.onIdle()
 
-    lateinit var recycler: RecyclerView
+    lateinit var recycleView: RecyclerView
+    lateinit var refreshView: SwipeRefreshLayout
 
     InstrumentationRegistry.getInstrumentation().runOnMainSync {
-        recycler = recyclerProvider()
+        recycleView = activity.findViewById(R.id.definitionsView)
+        refreshView = activity.findViewById(R.id.swipeRefreshView)
     }
 
-    while (recycler.hasPendingAdapterUpdates()) {
+    while (recycleView.hasPendingAdapterUpdates() || refreshView.isRefreshing) {
         Thread.sleep(10)
     }
 }
+

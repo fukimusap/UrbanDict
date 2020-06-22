@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbarView)
         setUpAdapter()
         setUpSearchView()
+        setUpActionBar()
 
         if (savedInstanceState == null) {
             handleIntent(intent)
@@ -108,12 +109,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        supportActionBar?.customView = searchView
-
-        supportActionBar?.setDisplayShowTitleEnabled(false)
-        supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        supportActionBar?.setDisplayShowCustomEnabled(true)
-
         swipeRefreshView.setOnRefreshListener {
             viewModel.refresh(currentSortOrder)
             inputMM.hideSoftInputFromWindow(searchView.applicationWindowToken, 0)
@@ -126,6 +121,15 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+
+    private fun setUpActionBar(){
+        supportActionBar?.customView = searchView
+
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        supportActionBar?.setDisplayShowCustomEnabled(true)
+    }
+
 
     private fun handleIntent(intent: Intent) {
         if (intent.action == Intent.ACTION_VIEW && intent.dataString?.startsWith(

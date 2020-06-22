@@ -27,10 +27,10 @@
 
   <com.google.android.material.bottomnavigation.BottomNavigationView
       android:id="@+id/navView"
-      android:layout_width="0dp"
+      android:layout_width="@dimen/margin_dimension"
       android:layout_height="wrap_content"
-      android:layout_marginStart="0dp"
-      android:layout_marginEnd="0dp"
+      android:layout_marginStart="@dimen/margin_dimension"
+      android:layout_marginEnd="@dimen/margin_dimension"
       android:background="?android:attr/windowBackground"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintLeft_toLeftOf="parent"
@@ -40,7 +40,7 @@
   <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
       android:id="@+id/swipeRefreshView"
       android:layout_width="match_parent"
-      android:layout_height="0dp"
+      android:layout_height="@dimen/margin_dimension"
       app:layout_constraintBottom_toTopOf="@+id/navView"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
@@ -48,7 +48,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/definitionsView"
-        android:padding="3dp"
+        android:padding="@dimen/padding_dimension"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:listitem="@layout/item_definition" />
