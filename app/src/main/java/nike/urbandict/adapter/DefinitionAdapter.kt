@@ -29,25 +29,6 @@ class DefinitionsAdapter : RecyclerView.Adapter<DefinitionViewHolder>() {
             }
         })
 
-    private var recyclerView: RecyclerView? = null
-
-    init {
-        differ.addListListener { _, currentList ->
-            if (currentList.isNotEmpty()) {
-                recyclerView?.let { view ->
-                    view.post {
-                        val linearSmoothScroller = object : LinearSmoothScroller(view.context) {
-                            override fun getVerticalSnapPreference(): Int {
-                                return SNAP_TO_START
-                            }
-                        }
-                        linearSmoothScroller.targetPosition = 0
-                        view.layoutManager?.startSmoothScroll(linearSmoothScroller)
-                    }
-                }
-            }
-        }
-    }
 
     override fun getItemCount(): Int {
         return differ.currentList.size
@@ -72,17 +53,6 @@ class DefinitionsAdapter : RecyclerView.Adapter<DefinitionViewHolder>() {
         holder.thumbsDownView.text = item.thumbsDown.toString()
     }
 
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
-        this.recyclerView = recyclerView
-    }
-
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView)
-        if (this.recyclerView == recyclerView) {
-            this.recyclerView = null
-        }
-    }
 }
 
 

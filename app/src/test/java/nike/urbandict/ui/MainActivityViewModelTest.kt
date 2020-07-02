@@ -99,7 +99,7 @@ class MainActivityViewModelTest {
 
             viewModel.search("wat", SortOrder.THUMBS_UP)
 
-            val value = viewModel.definitions.getOrAwaitValue()
+            val value = viewModel.getDefinitions().getOrAwaitValue()
             assertNull(value.error)
             assertEquals(false, value.isLoading)
             assertEquals(response.list.size, value.data?.size)
@@ -123,7 +123,7 @@ class MainActivityViewModelTest {
 
             viewModel.search("wat", SortOrder.THUMBS_UP)
 
-            val value = viewModel.definitions.getOrAwaitValue()
+            val value = viewModel.getDefinitions().getOrAwaitValue()
             assertNotNull(value.error)
 
             verify(api).define(eq("wat"))
@@ -144,14 +144,14 @@ class MainActivityViewModelTest {
 
             viewModel.search("wat", SortOrder.THUMBS_UP)
 
-            var value = viewModel.definitions.getOrAwaitValue()
+            var value = viewModel.getDefinitions().getOrAwaitValue()
             assertNull(value.error)
             assertEquals(false, value.isLoading)
             assertEquals(4L, value.data?.get(0)?.id)
 
             viewModel.sort(SortOrder.THUMBS_DOWN)
 
-            value = viewModel.definitions.getOrAwaitValue()
+            value = viewModel.getDefinitions().getOrAwaitValue()
             assertNull(value.error)
             assertEquals(false, value.isLoading)
             assertEquals(2L, value.data?.get(0)?.id)
@@ -174,13 +174,13 @@ class MainActivityViewModelTest {
 
             viewModel.search("wat", SortOrder.THUMBS_UP)
 
-            val value = viewModel.definitions.getOrAwaitValue()
+            val value = viewModel.getDefinitions().getOrAwaitValue()
             assertNull(value.error)
             assertEquals(false, value.isLoading)
             assertEquals(4L, value.data?.get(0)?.id)
 
             viewModel.refresh(SortOrder.THUMBS_UP)
-            viewModel.definitions.getOrAwaitValue()
+            viewModel.getDefinitions().getOrAwaitValue()
             verify(api, times(2)).define(eq("wat"))
         }
     }
@@ -203,7 +203,7 @@ class MainActivityViewModelTest {
 
             viewModel.search("wat", SortOrder.THUMBS_UP)
 
-            val value = viewModel.definitions.getOrAwaitValue()
+            val value = viewModel.getDefinitions().getOrAwaitValue()
             assertNull(value.error)
             assertEquals(true, value.isLoading)
         }

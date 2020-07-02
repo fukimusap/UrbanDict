@@ -13,6 +13,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 import nike.urbandict.R
@@ -68,7 +69,19 @@ class MainActivity : AppCompatActivity() {
         val layoutManager = LinearLayoutManager(this)
         definitionsView.layoutManager = layoutManager
         definitionsView.adapter = adapter
-        viewModel.definitions.observe(this, Observer { result ->
+            definitionsView?.let { view ->
+                view.post {
+                    val linearSmoothScroller = object : LinearSmoothScroller(view.context) {
+                        override fun getVerticalSnapPreference(): Int {
+                            return SNAP_TO_START
+                        }
+                    }
+                    linearSmoothScroller.targetPosition = 0
+                    view.layoutManager?.startSmoothScroll(linearSmoothScroller)
+                }
+            }
+
+        viewModel.getDefinitions().observe(this, Observer { result ->
             swipeRefreshView.isRefreshing = result.isLoading
             navView.isEnabled = !result.isLoading
             adapter.submitList(result.data.orEmpty())

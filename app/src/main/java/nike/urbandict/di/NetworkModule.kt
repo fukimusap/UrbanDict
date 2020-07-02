@@ -17,12 +17,13 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
+import javax.inject.Singleton
 
 
 @Module
 @InstallIn(ApplicationComponent::class)
 class NetworkModule {
-
+    @Singleton
     @Provides
     fun provideApi(@ApplicationContext context: Context, @BaseUrl url: String, @Headers headers: Map<String, String>): UrbanDictApi {
         val httpCacheDirectory = File(context.cacheDir, "http-cache")

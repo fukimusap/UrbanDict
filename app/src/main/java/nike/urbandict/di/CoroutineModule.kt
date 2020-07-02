@@ -5,12 +5,13 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
 import kotlinx.coroutines.Dispatchers
+import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 
 @Module
 @InstallIn(ApplicationComponent::class)
 class CoroutineModule {
-
+    @Singleton
     @Provides
     fun provideCoroutineContext(): CoroutineContextProvider {
         return CoroutineContextProvider()

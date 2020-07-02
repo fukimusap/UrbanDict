@@ -18,8 +18,7 @@ class MainActivityViewModel @ViewModelInject constructor(
     private val coroutineContextProvider: CoroutineContextProvider,
     private val definitionsProcessor: DefinitionsProcessor
 ) : ViewModel() {
-
-    val definitions: LiveData<Result<List<ProcessedDefinition>>> = MutableLiveData()
+    private val definitions: MutableLiveData<Result<List<ProcessedDefinition>>> = MutableLiveData()
 
     private var searchTerm: String? = null
     private var currentJob: Job? = null
@@ -36,6 +35,7 @@ class MainActivityViewModel @ViewModelInject constructor(
             search(searchTerm.orEmpty(), sortOrder)
         }
     }
+    fun getDefinitions(): LiveData<Result<List<ProcessedDefinition>>> = definitions
 
     fun sort(sortOrder: SortOrder) {
         stateHandle[STATE_SORT_ORDER] = sortOrder.ordinal
